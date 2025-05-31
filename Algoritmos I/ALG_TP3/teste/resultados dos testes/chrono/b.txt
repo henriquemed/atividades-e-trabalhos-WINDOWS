@@ -1,0 +1,30 @@
+PS H:\trabalhos UFMG\ALG_TP3\teste> make test
+g++ -std=c++11 -Iinclude -Wall -Wextra -Wpedantic -Wformat-security -Wconversion -Werror -c src/main.cpp -o obj/main.o
+g++ -std=c++11 -Iinclude -Wall -Wextra -Wpedantic -Wformat-security -Wconversion -Werror -o tp3.exe obj/main.o obj/graph.o obj/brute.o obj/dynamic.o obj/greedy.o
+tp3.exe < testCase01.txt
+283
+Cyberia Quasar Augmented Elysium 
+Tempo de execucao: 3 ms
+tp3.exe < testCase02.txt
+684
+Fusion Energy Giga Solara Radiance 
+Tempo de execucao: 4 ms
+tp3.exe < testCase03.txt
+510
+Olympus Reality Chintham Eclipse Organic Gravity 
+Tempo de execucao: 4 ms
+tp3.exe < testCase04.txt
+611
+Technos Mega Time Light Denbutree Vanguard Xanadu Matrix
+Tempo de execucao: 48 ms
+tp3.exe < testCase05.txt
+569
+Tad Veridia Molecule Synergy Lyddwquaygrave Atheria 
+Bridmuch Comet Avalon
+Tempo de execucao: 437 ms
+tp3.exe < testCase06.txt 
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+Makefile:53: recipe for target 'test' failed
+make: *** [test] Error 3
+PS H:\trabalhos UFMG\ALG_TP3\teste>

@@ -1,0 +1,52 @@
+#include <iostream>
+#include "graph.hpp"
+#include "brute.hpp"
+#include "dynamic.hpp"
+#include "greedy.hpp"
+
+using namespace std;
+
+int main () {
+    char strategy;
+    cin >> strategy;
+
+    int n_cities, n_roads;
+    cin >> n_cities >> n_roads;
+
+    Graph g(n_cities);
+
+    string city_A, city_B;
+    int distance;
+    for (int i=0; i < n_roads; i++) {
+        cin >> city_A >> city_B >> distance;
+        if (g.cityAdded(city_A) == -1) g.addCity(city_A);
+        if (g.cityAdded(city_B) == -1) g.addCity(city_B);
+        g.addRoad(g.cityAdded(city_A), g.cityAdded(city_B), distance);
+        g.addRoad(g.cityAdded(city_B), g.cityAdded(city_A), distance);
+    }
+
+    if (strategy == 'b') {
+        vector<int> starter_vector = generateStarterVector(n_cities);
+        vector<vector<int>> permutations = generatePermutationsVector(starter_vector);
+        vector<int> smallest_path = returnSmallestPath(permutations, g);
+        printResult(smallest_path, g);
+    } else if (strategy == 'd') {
+        pair<int, vector<string>> result = solveTSPDynamic(g);
+        int minCost = result.first;
+        vector<string> smallest_path = result.second;
+
+        cout << minCost << endl;
+        for (const string& city : smallest_path) {
+            cout << city << " ";
+        }
+        cout << endl;
+
+    } else if (strategy == 'g') {
+        vector<int> smallest_path = returnSmallestPath(g);
+        printResult(smallest_path, g);
+    } else {
+        cout << "Insert a valid option for strategy." << endl;
+    }
+
+    return 0;
+}

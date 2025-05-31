@@ -1,0 +1,72 @@
+#include "dynamic.hpp"
+
+void dfs(int current, vector<int>& path, int& cost, vector<vector<int>>& tree, Graph& g, vector<bool>& visited, int root, vector<int>& best_cost) {
+    path.push_back(current);
+
+    if (current != root) cost += g.hasRoad(path[path.size() - 2], current);
+
+    // verificar se atingiu o número de cidades e há um caminho de volta à raiz
+    if ((int)path.size() == g.n_vertices) {
+        if (g.hasRoad(current, root) > 0) {
+            path.push_back(root);
+            cost += g.hasRoad(current, root);
+            path.push_back(cost);
+            tree.push_back(path);
+            // armazena o menor custo diretamente
+            if (cost < best_cost[root]) {
+                best_cost[root] = cost;
+            }
+        }
+        path.pop_back();
+        return;
+    }
+
+    visited[current] = true;
+    for (int i = 0; i < g.n_vertices; i++) {
+        if (!visited[i] && g.hasRoad(current, i) > 0) {
+            dfs(i, path, cost, tree, g, visited, root, best_cost);
+        }
+    }
+    visited[current] = false;
+    path.pop_back();
+}
+
+vector<vector<int>> buildTree(int root, Graph g, vector<int>& best_cost) {
+    vector<vector<int>> tree;
+    vector<bool> visited(g.n_vertices, false);
+    vector<int> path;
+    int cost = 0;
+
+    dfs(root, path, cost, tree, g, visited, root, best_cost);
+
+    return tree;
+}
+
+vector<vector<vector<int>>> buildPossibilityTrees(int n_cities, Graph g) {
+    vector<vector<vector<int>>> tree_vector(n_cities);
+    vector<int> best_cost(n_cities, 99999);  // inicializa com um valor grande o suficiente
+
+    // busca árvores para cada cidade, mas para se o melhor custo já for encontrado
+    for (int i = 0; i < n_cities; i++) {
+        tree_vector[i] = buildTree(i, g, best_cost);
+    }
+
+    return tree_vector;
+}
+
+vector<int> returnSmallestPath(vector<vector<vector<int>>> tree_vector) {
+    vector<int> smallest_path;
+    int smallest_cost = 99999;
+
+    for (int i = 0; i < static_cast<int>(tree_vector.size()); i++) {
+        for (const auto& path : tree_vector[i]) {
+            int cost = path.back(); // último elemento é o custo
+            if (cost < smallest_cost) {
+                smallest_cost = cost;
+                smallest_path = path;
+            }
+        }
+    }
+
+    return smallest_path;
+}

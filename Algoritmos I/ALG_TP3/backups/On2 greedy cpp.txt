@@ -1,0 +1,62 @@
+#include "greedy.hpp"
+#include <climits>
+#include <vector>
+
+using namespace std;
+
+vector<int> returnSmallestPath(Graph g) {
+    int n_cities = g.n_vertices;
+    vector<int> smallest_path;
+    int smallest_cost = INT_MAX;
+
+    for (int starter_v = 0; starter_v < n_cities; starter_v++) {  // repete para cada vértice inicial
+        vector<int> current_path;
+        int current_cost = 0;
+
+        vector<bool> visited(n_cities, false); // usa um vector para marcar os vértices visitados
+        visited[starter_v] = true;  // o vértice inicial começa visitado, naturalmente
+        int current_vertice = starter_v;    // começamos a busca pelo vértice inicial
+
+        current_path.push_back(starter_v); // adiciona o vértice inicial ao caminho
+
+        bool finished = false;
+        while (!finished) {
+            int road_index = -1;
+            int road_cost = INT_MAX;
+
+            // encontra o menor custo de estrada e o salva
+            for (int col = 0; col < n_cities; col++) {
+                int cost = g.hasRoad(current_vertice, col);
+                if (cost > 0 && cost < road_cost && !visited[col]) {
+                    road_cost = cost;
+                    road_index = col;
+                }
+            }
+
+            if (road_index == -1) { // se não há mais estradas para seguir
+                finished = true;
+            } else {
+                visited[road_index] = true; // marca o vértice como visitado
+                current_vertice = road_index;   // sigo caminho pelo vértice de menor custo
+                current_path.push_back(road_index);
+                current_cost += road_cost;
+            }
+        }
+
+        // verifica se há uma estrada de volta para o vértice inicial
+        if (g.hasRoad(current_vertice, starter_v) > 0) {
+            current_cost += g.hasRoad(current_vertice, starter_v);
+            current_path.push_back(starter_v);
+
+            // se o custo do caminho atual for o menor encontrado, o caminho e custo são salvos
+            if (current_cost < smallest_cost) {
+                smallest_path = current_path;
+                smallest_cost = current_cost;
+            }
+        }
+    }
+
+    smallest_path.push_back(-1);    // para ficar de acordo com a impressão, que pula o penúltimo
+    smallest_path.push_back(smallest_cost);
+    return smallest_path;
+}

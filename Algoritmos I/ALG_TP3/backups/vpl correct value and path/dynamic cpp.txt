@@ -1,0 +1,67 @@
+#include "dynamic.hpp"
+#include <limits>
+
+int tsp(int mask, int pos, vector<vector<int>> &dist, vector<vector<int>> &dp, int n) {
+    if (mask == (1 << n) - 1) {
+        return dist[pos][0];
+    }
+    if (dp[mask][pos] != -1) {
+        return dp[mask][pos];
+    }
+
+    int ans = INF;
+    for (int city = 0; city < n; city++) {
+        if ((mask & (1 << city)) == 0 && dist[pos][city] != 0) { // Verifica se existe aresta
+            int newAns = dist[pos][city] + tsp(mask | (1 << city), city, dist, dp, n);
+            ans = min(ans, newAns);
+        }
+    }
+    return dp[mask][pos] = ans;
+}
+
+pair<int, vector<string>> solveTSPDynamic(Graph &g) {
+    int n = g.n_vertices;
+    vector<vector<int>> dist(n, vector<int>(n, 0)); // Inicializa com 0
+    vector<vector<int>> dp(1 << n, vector<int>(n, -1));
+    vector<string> cityNames(n);
+
+    for (int i = 0; i < n; ++i) {
+        cityNames[i] = g.city_names[i]; // Usa city_names diretamente
+        for (int j = 0; j < n; ++j) {
+            dist[i][j] = g.hasRoad(i, j); // Usa hasRoad para obter as distâncias
+            if (dist[i][j] == 0) {
+                dist[i][j] = INF; // Define como INF se não houver estrada
+            }
+        }
+    }
+
+    int minCost = tsp(1, 0, dist, dp, n);
+
+    vector<string> path;
+    int mask = 1;
+    int pos = 0;
+    path.push_back(cityNames[0]);
+
+    while (mask != (1 << n) - 1) {
+        int nextCity = -1;
+        int bestCost = INF;
+
+        for (int city = 0; city < n; ++city) {
+            if (!(mask & (1 << city)) && dist[pos][city] != INF) {
+                if (dist[pos][city] + dp[mask | (1 << city)][city] == dp[mask][pos]) {
+                    nextCity = city;
+                    break;
+                }
+            }
+        }
+        if(nextCity == -1) break;
+
+        path.push_back(cityNames[nextCity]);
+        pos = nextCity;
+        mask |= (1 << pos);
+    }
+
+    path.push_back(cityNames[0]);
+
+    return {minCost, path};
+}
